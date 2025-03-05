@@ -7,8 +7,11 @@ import asyncio
 
 # Настройки
 TOKEN = os.getenv("TOKEN")
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # URL, который выдаст Render
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 PORT = int(os.getenv("PORT", 5000))
+
+if not TOKEN:
+    raise ValueError("Переменная окружения TOKEN не установлена!")
 
 # Включаем логирование
 logging.basicConfig(level=logging.INFO)
@@ -29,18 +32,21 @@ def home():
     return "Бот работает!"
 
 @app.route("/webhook", methods=["POST"])
-async def telegram_webhook():
+def telegram_webhook():
     """Обрабатываем запросы от Telegram"""
     update = Update(**request.json)
-    await dp.feed_update(bot, update)
+    asyncio.run(dp.feed_update(bot, update))  # Исправляем ошибку Flask
     return "OK", 200
+
+@app.before_first_request
+def activate_webhook():
+    """Настраиваем Webhook при первом запросе"""
+    asyncio.run(set_webhook())
 
 async def set_webhook():
     """Устанавливаем Webhook"""
     await bot.set_webhook(WEBHOOK_URL + "/webhook")
 
-# Запуск бота
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(set_webhook())
     app.run(host="0.0.0.0", port=PORT)
+
