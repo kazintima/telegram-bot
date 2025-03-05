@@ -1,0 +1,2 @@
+*.exe filter=lfs diff=lfs merge=lfs -text
+Git-2.48.1-64-bit.exe filter=lfs diff=lfs merge=lfs -text
