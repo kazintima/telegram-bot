@@ -1,4 +1,16 @@
 import os
+from dotenv import load_dotenv
+
+# Загружаем переменные окружения из .env
+load_dotenv()
+
+TOKEN = os.getenv("TOKEN")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+
+if not TOKEN:
+    raise ValueError("Переменная окружения TOKEN не установлена!")
+
+import os
 import logging
 from flask import Flask, request
 from aiogram import Bot, Dispatcher, types
